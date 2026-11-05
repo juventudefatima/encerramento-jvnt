@@ -2,7 +2,7 @@
 const C = {
   supabaseUrl: "https://dchbexdpoxgnxbffpstw.supabase.co",   // ex.: https://xxxx.supabase.co  (vazio = modo demonstração)
   anonKey: "sb_publishable_8hUHO4wHs_4VVjl5e2C4JQ_6BSjCfUA",       // chave "anon public" do Supabase
-  driveUrl: "https://script.google.com/macros/s/AKfycbx96Z0O2TO_5Kx86Rjn__eBchIC200A_nLlwxUxL8l7XWtyvQl_5__GM3KWJujrEHtz4A/exec",      // URL do Apps Script publicado (comprovantes -> Drive)
+  driveUrl: "https://script.google.com/macros/s/AKfycbyrTHdREE4yJCtmQJGi2n_SRCYm6cfAxyae9EyTVNbZqYgooBBaOkpEhP6l8WTwD7qxhA/exec",      // URL do Apps Script publicado (comprovantes -> Drive)
   evento: { data: "[DATA]", hora: "[HORÁRIO]", local: "[LOCAL]" },
   pixChave: "juventude.fatima.xv@gmail.com",
   // Pix copia e cola de cada modalidade (já com o valor embutido). O QR Code está em assets/pix-40.png, pix-50.png, pix-60.png
