@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Encerramento da Juventude de Fátima</title>
+<style>
+:root{--n:#07305a;--t:#d3b793;--r:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--n);color:#1b2733;font:16px/1.5 system-ui,Segoe UI,Arial,sans-serif}
+main{max-width:520px;margin:0 auto;padding:16px 16px 28px}
+header{background:#fff;border-radius:14px;border-bottom:5px solid var(--t);padding:14px 18px 16px;text-align:center;margin-bottom:16px}
+header img{width:100%;max-width:290px;height:auto}
+h1{font:700 22px/1.2 Georgia,serif;color:var(--n);margin:8px 0 2px}
+header p{margin:0;color:#4a5a6a;font-size:14px}
+.card{display:none;background:#fff;border-radius:14px;padding:20px}
+.card.on{display:block}
+h2{font:700 20px/1.25 Georgia,serif;color:var(--n);margin:0 0 12px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input{width:100%;padding:12px;border:2px solid #9fb0c2;border-radius:8px;font:inherit}
+input:focus{border-color:var(--n)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--t);outline-offset:2px}
+button{margin-top:14px;width:100%;padding:13px;border:0;border-radius:8px;background:var(--n);color:#fff;font:700 16px system-ui,Arial;cursor:pointer}
+button.sec{background:#fff;color:var(--n);border:2px solid var(--n)}
+button:disabled{opacity:.5}
+.msg{margin:10px 0 0;min-height:1em}.err{color:var(--r);font-weight:600}
+.val{font:700 40px Georgia,serif;color:var(--n);margin:2px 0 6px}
+.qr{display:block;margin:6px auto;width:220px;max-width:70%;border:6px solid var(--t);border-radius:10px}
+small{color:#4a5a6a}
+.auth{font-family:Georgia,serif;line-height:1.7}
+.ass{margin-top:56px;border-top:1px solid #000;padding-top:4px;font-size:14px}
+footer{text-align:center;margin-top:22px;color:#fff;font-size:13px}
+footer img{display:block;margin:6px auto 0;width:140px;height:auto}
+@media print{body{background:#fff}header,footer,.noprint,.card:not(#s4){display:none!important}#s4{padding:0}}
+</style></head><body><main>
+<header><img src="assets/logo-juventude.png" alt="Juventude de Fátima"><h1>Encerramento · Noite do Hambúrguer</h1><p id="ev"></p></header>
+
+<section id="s1" class="card on">
+  <h2>Qual é o seu nome completo?</h2>
+  <input id="nome" autocomplete="name" placeholder="Nome e sobrenome">
+  <button id="b1">Buscar meu nome</button><p id="m1" class="msg"></p>
+  <div id="r1" hidden>
+    <p id="t1"></p><div class="val" id="v1"></div>
+    <button id="ok1">Sim, sou eu. Continuar</button>
+    <button id="no1" class="sec">Corrigir o nome</button>
+  </div>
+</section>
+
+<section id="s2" class="card">
+  <h2 id="h2">Seus dados</h2>
+  <p id="hint" hidden><small>Já preenchemos o que a organização tinha. Confira, corrija se precisar e digite o seu CPF.</small></p>
+  <label for="nasc">Data de nascimento</label><input id="nasc" type="date">
+  <label for="cpf">CPF</label><input id="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+  <label for="tel">Telefone com DDD</label><input id="tel" type="tel" autocomplete="tel">
+  <div id="rw" hidden>
+    <h2 style="margin-top:22px">Dados do responsável</h2>
+    <p>Como o participante é menor de 18 anos, precisamos dos dados do responsável (maior de idade).</p>
+    <label for="resp">Nome do responsável</label><input id="resp">
+    <label for="rcpf">CPF do responsável</label><input id="rcpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+    <label for="rtel">Telefone do responsável com DDD</label><input id="rtel" type="tel">
+  </div>
+  <button id="b2">Continuar para o pagamento</button><p id="m2" class="msg"></p>
+</section>
+
+<section id="s3" class="card">
+  <h2>Pague com Pix</h2>
+  <div class="val" id="v3"></div>
+  <img id="qr" class="qr" alt="QR Code do Pix">
+  <button id="cp">Copiar Pix copia e cola</button>
+  <button id="ck" class="sec">Copiar chave Pix (e-mail)</button>
+  <p><small>O valor já está dentro do código. Na tela do banco, o recebedor pode aparecer como "GERADOR DE PIX": é normal.</small></p>
+  <label for="arq">Depois de pagar, anexe o comprovante (foto ou PDF)</label><input id="arq" type="file" accept="image/*,application/pdf">
+  <button id="b3">Enviar comprovante e gerar autorização</button><p id="m3" class="msg"></p>
+</section>
+
+<section id="s4" class="card">
+  <div class="noprint"><h2>Tudo certo!</h2><p>Imprima a autorização, assine e leve no dia do evento.</p><button onclick="print()">Imprimir autorização</button></div>
+  <div id="auth" class="auth"></div>
+</section>
+<footer>Desenvolvido por Igor Cabral<a href="https://igorcabral.dev.br"><img src="assets/logo-igorcabral.png" alt="Igor Cabral"></a></footer>
+</main>
+<script src="config.js"></script>
+<script>
+const $=id=>document.getElementById(id),S={},demo=!C.supabaseUrl;
+const brl=v=>"R$ "+Number(v).toFixed(2).replace(".",",");
+const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g," ");
+const go=n=>{document.querySelectorAll(".card").forEach(c=>c.classList.toggle("on",c.id==="s"+n));scrollTo(0,0)};
+const say=(id,t,e)=>{$(id).textContent=t;$(id).className="msg"+(e?" err":"")};
+const api=async(fn,body)=>{const r=await fetch(C.supabaseUrl+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:C.anonKey,...(C.anonKey.startsWith("eyJ")?{Authorization:"Bearer "+C.anonKey}:{}),"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());const t=await r.text();return t?JSON.parse(t):null};
+const ERR={cpf_igual:"O CPF do responsável deve ser diferente do CPF do participante.",cpf_duplicado:"Este CPF já tem uma inscrição. Procure a organização se precisar alterar.",cpf_nao_confere:"O CPF não confere com o cadastro da organização. Confira os números.",cpf_menor_responsavel:"Este CPF já foi informado como responsável em outra inscrição e não pode ser de um menor.",responsavel_menor:"O CPF do responsável pertence a um menor já inscrito. Informe um responsável maior de 18 anos.",responsavel_obrigatorio:"Preencha nome, CPF e telefone do responsável."};
+const msgErro=e=>{try{return ERR[JSON.parse(e.message).message]}catch(_){}};
+const copiar=t=>{const fb=()=>{const a=document.createElement("textarea");a.value=t;document.body.append(a);a.select();document.execCommand("copy");a.remove()};navigator.clipboard?navigator.clipboard.writeText(t).catch(fb):fb()};
+$("ev").textContent=`${C.evento.data} às ${C.evento.hora} · ${C.evento.local}`;
+
+$("b1").onclick=async()=>{
+  const n=$("nome").value.trim().replace(/\s+/g," ");
+  if(n.split(" ").length<2)return say("m1","Digite nome e sobrenome.",1);
+  $("b1").disabled=true;say("m1","Buscando...");
+  try{
+    const p=demo?(C.demo[norm(n)]||null):await api("buscar_participante",{p_nome:n});
+    S.nome=n;S.pre=p||{};S.valor=p?p.valor:60;
+    $("t1").textContent=p?`Encontramos você, ${n}. ${C.modalidades[p.valor]}`:`Não encontramos "${n}" na lista de vendedores. ${C.modalidades[60]}`;
+    $("v1").textContent=brl(S.valor);$("r1").hidden=false;$("b1").hidden=true;say("m1","");
+  }catch(e){say("m1","Não foi possível buscar agora. Tente de novo em instantes.",1)}
+  $("b1").disabled=false};
+$("no1").onclick=()=>{$("r1").hidden=true;$("b1").hidden=false;$("nome").focus()};
+$("nasc").onchange=()=>{const d=new Date($("nasc").value+"T12:00"),h=new Date();let a=h.getFullYear()-d.getFullYear();if(h<new Date(h.getFullYear(),d.getMonth(),d.getDate()))a--;S.menor=a<18;$("rw").hidden=!S.menor};
+$("ok1").onclick=()=>{const p=S.pre,pre=Object.keys(p).length>1;
+  $("nasc").value=p.nascimento||"";$("tel").value=p.telefone||"";$("resp").value=p.responsavel||"";$("rtel").value=p.responsavel_telefone||"";$("cpf").value="";$("rcpf").value="";
+  $("nasc").onchange();$("h2").textContent=pre?"Confira seus dados":"Seus dados";$("hint").hidden=!pre;go(2)};
+
+const cpfOk=c=>{c=c.replace(/\D/g,"");if(c.length!==11||/^(\d)\1+$/.test(c))return false;for(let t=9;t<11;t++){let s=0;for(let i=0;i<t;i++)s+=c[i]*(t+1-i);if((s*10%11)%10!=c[t])return false}return true};
+const mask=e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2")};
+["cpf","rcpf"].forEach(i=>$(i).oninput=mask);
+$("b2").onclick=async()=>{
+  $("nasc").onchange();
+  const nasc=$("nasc").value,cpf=$("cpf").value,tel=$("tel").value.trim(),resp=$("resp").value.trim(),rcpf=$("rcpf").value,rtel=$("rtel").value.trim();
+  const fone=t=>t.replace(/\D/g,"").length>=10,dig=t=>t.replace(/\D/g,"");
+  if(!nasc||!fone(tel))return say("m2","Preencha a data de nascimento e o telefone com DDD.",1);
+  if(!cpfOk(cpf))return say("m2","CPF do participante inválido. Confira os números.",1);
+  if(S.menor){
+    if(resp.length<5||!cpfOk(rcpf)||!fone(rtel))return say("m2","Preencha nome, CPF válido e telefone com DDD do responsável.",1);
+    if(dig(rcpf)===dig(cpf))return say("m2",ERR.cpf_igual,1)}
+  Object.assign(S,{nasc,cpf,tel,resp:S.menor?resp:"",rcpf:S.menor?rcpf:"",rtel:S.menor?rtel:"",id:crypto.randomUUID()});
+  $("b2").disabled=true;say("m2","Salvando...");
+  try{
+    if(!demo){const r=await api("registrar_inscricao",{p_id:S.id,p_nome:S.nome,p_nascimento:nasc,p_cpf:S.cpf,p_telefone:tel,p_responsavel:S.resp,p_responsavel_cpf:S.rcpf,p_responsavel_telefone:S.rtel});S.id=r.id;S.valor=r.valor}
+    $("v3").textContent=brl(S.valor);$("qr").src="assets/pix-"+S.valor+".png";go(3);say("m2","");
+  }catch(e){say("m2",msgErro(e)||"Não foi possível salvar. Tente de novo.",1)}
+  $("b2").disabled=false};
+$("cp").onclick=()=>{copiar(C.pixCopiaCola[S.valor]);$("cp").textContent="Código copiado"};
+$("ck").onclick=()=>{copiar(C.pixChave);$("ck").textContent="Chave copiada: "+C.pixChave};
+
+const ler=f=>new Promise((ok,no)=>{if(f.type.startsWith("image/")){const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok({mime:"image/jpeg",b:c.toDataURL("image/jpeg",.8).split(",")[1],ext:"jpg"})};i.onerror=no;i.src=URL.createObjectURL(f)}else{const r=new FileReader();r.onload=()=>ok({mime:f.type,b:r.result.split(",")[1],ext:"pdf"});r.onerror=no;r.readAsDataURL(f)}});
+$("b3").onclick=async()=>{
+  const f=$("arq").files[0];
+  if(!f)return say("m3","Anexe o comprovante para continuar.",1);
+  if(f.size>8e6)return say("m3","Arquivo grande demais (máx. 8 MB).",1);
+  $("b3").disabled=true;say("m3","Enviando...");
+  try{
+    if(!demo&&C.driveUrl){
+      const a=await ler(f);
+      const r=await fetch(C.driveUrl,{method:"POST",body:JSON.stringify({nome:`${S.nome} - ${S.id.slice(0,8)}.${a.ext}`,mime:a.mime,base64:a.b})});
+      const j=await r.json();if(!j.ok)throw 0;
+      await api("salvar_comprovante",{p_id:S.id,p_url:j.url});
+    }
+    const fmt=new Date(S.nasc+"T12:00").toLocaleDateString("pt-BR");
+    const dados={nome:S.nome,cpf:S.cpf,nascimento:fmt,telefone:S.tel,responsavel:S.resp,responsavel_cpf:S.rcpf,responsavel_telefone:S.rtel,valor:Number(S.valor).toFixed(2).replace(".",","),...C.evento};
+    const fill=t=>t.replace(/\{(\w+)\}/g,(m,k)=>dados[k]??m);
+    const partes=S.menor?[["Autorização de participação",C.autParticipacaoMenor,S.resp+" (responsável)"],["Autorização de uso de imagem",C.autImagemMenor,S.resp+" (responsável)"]]:[["Autorização de uso de imagem",C.autImagemMaior,S.nome]];
+    const A=$("auth");A.textContent="";
+    const lg=new Image();lg.src="assets/logo-juventude.png";lg.alt="Juventude de Fátima";lg.style.cssText="display:block;margin:0 auto 10px;max-width:200px";A.append(lg);
+    const dt=document.createElement("p");dt.style.textAlign="right";dt.textContent="Data: "+new Date().toLocaleDateString("pt-BR");A.append(dt);
+    partes.forEach(([t,x,q])=>{const d=document.createElement("div"),e=document.createElement("h2"),p=document.createElement("p"),a=document.createElement("div");d.style.marginBottom="28px";e.textContent=t;e.style.textAlign="center";p.textContent=fill(x);a.className="ass";a.textContent=q;d.append(e,p,a);A.append(d)});
+    go(4);
+  }catch(e){say("m3","Não foi possível enviar o comprovante. Tente de novo.",1)}
+  $("b3").disabled=false};
+</script></body></html>
