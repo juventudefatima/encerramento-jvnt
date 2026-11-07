@@ -58,7 +58,7 @@ th{background:#f5f7fa;position:sticky;top:0}
     <div class="box"><h2 id="ft">Cadastrar participante</h2>
       <div class="g">
         <div><label for="nome">Nome completo</label><input id="nome"></div>
-        <div><label for="valor">Modalidade de pagamento</label><select id="valor"><option value="40">R$ 40,00 · vendeu mais de 5 tickets</option><option value="50">R$ 50,00 · vendeu menos de 5 tickets</option><option value="60">R$ 60,00 · não vendeu tickets</option></select></div>
+        <div><label for="valor">Modalidade de pagamento</label><select id="valor"><option value="0">Gratuito · vendeu 10 tickets ou mais (1 bloco)</option><option value="40">R$ 40,00 · vendeu mais de 5 tickets</option><option value="50">R$ 50,00 · vendeu menos de 5 tickets</option><option value="60">R$ 60,00 · não vendeu tickets</option></select></div>
       </div>
       <details style="margin-top:10px"><summary><b>Pré-preencher dados (opcional)</b> — a pessoa só confere e confirma</summary>
         <div class="g">
@@ -74,7 +74,7 @@ th{background:#f5f7fa;position:sticky;top:0}
       <p><button id="salvar">Salvar participante</button> <button id="cancel" class="sec" hidden>Cancelar edição</button></p>
     </div>
     <div class="box"><h2>Colar lista de nomes</h2>
-      <p><small>Um por linha como <b>Nome;40</b>, ou agrupe por título: uma linha <b>R$ 40:</b> seguida dos nomes. Nomes já cadastrados são ignorados.</small></p>
+      <p><small>Um por linha como <b>Nome;40</b>, ou agrupe por título: uma linha <b>R$ 40:</b> (ou <b>Gratuito:</b>) seguida dos nomes. Nomes já cadastrados são ignorados.</small></p>
       <textarea id="lista" rows="8" placeholder="R$ 40:&#10;Maria da Silva&#10;João Souza&#10;&#10;R$ 50:&#10;Ana Pereira"></textarea>
       <p><button id="imp">Importar lista</button></p>
     </div>
@@ -88,8 +88,9 @@ const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g," ");
 const fc=c=>c?c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,"$1.$2.$3-$4"):"";
 const brl=v=>"R$ "+Number(v).toFixed(2).replace(".",",");
+const mod=v=>Number(v)===0?"Gratuito":brl(v);
 const msg=(t,e)=>{$("msg").textContent=t;$("msg").className=e?"e":""};
-const api=async(fn,b)=>{const r=await fetch(C.supabaseUrl+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:C.anonKey,Authorization:"Bearer "+C.anonKey,"Content-Type":"application/json"},body:JSON.stringify({p_senha:senha,...b})});const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null};
+const api=async(fn,b)=>{const r=await fetch(C.supabaseUrl+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:C.anonKey,...(C.anonKey.startsWith("eyJ")?{Authorization:"Bearer "+C.anonKey}:{}),"Content-Type":"application/json"},body:JSON.stringify({p_senha:senha,...b})});const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null};
 const carregar=async()=>{D=await api("admin_listar",{});desenha()};
 const entrar=async()=>{
   if(!C.supabaseUrl){$("lm").textContent="Configure o Supabase no config.js primeiro.";return}
@@ -103,11 +104,11 @@ document.querySelectorAll(".tabs [data-p]").forEach(b=>b.onclick=()=>{document.q
 
 function desenha(){
   const I=D.inscricoes;
-  $("res").innerHTML=[40,50,60].map(v=>{const l=I.filter(i=>i.valor===v),c=l.filter(i=>i.status==="confirmado");return `<div class="card">${brl(v)}<b>${c.length} confirmados</b><small>${l.length} inscritos · ${brl(c.length*v)} confirmados</small></div>`}).join("")+`<div class="card">Total<b>${brl(I.filter(i=>i.status==="confirmado").reduce((s,i)=>s+i.valor,0))}</b><small>${I.length} inscrições · ${D.participantes.length} na lista</small></div>`;
+  $("res").innerHTML=[0,40,50,60].map(v=>{const l=I.filter(i=>i.valor===v),c=l.filter(i=>i.status==="confirmado");return `<div class="card">${mod(v)}<b>${c.length} confirmados</b><small>${l.length} inscritos · ${brl(c.length*v)} confirmados</small></div>`}).join("")+`<div class="card">Total<b>${brl(I.filter(i=>i.status==="confirmado").reduce((s,i)=>s+i.valor,0))}</b><small>${I.length} inscrições · ${D.participantes.length} na lista</small></div>`;
   const f=norm($("fi").value||""),fd=f.replace(/\D/g,"");
-  $("ti").innerHTML=I.filter(i=>!f||norm(i.nome).includes(f)||(fd&&(i.cpf||"").includes(fd))).map(i=>`<tr><td>${esc(i.nome)}${i.na_lista?"":" <small>(fora da lista)</small>"}</td><td>${brl(i.valor)}</td><td>${fc(i.cpf)}</td><td>${esc(i.telefone)}</td><td>${i.responsavel?esc(i.responsavel)+"<br><small>"+fc(i.responsavel_cpf)+" · "+esc(i.responsavel_telefone)+"</small>":"—"}</td><td>${i.comprovante_url?`<a href="${esc(i.comprovante_url)}" target="_blank" rel="noopener">Abrir</a>`:"<span class=pen>Falta</span>"}</td><td><select data-st="${i.id}"><option value="pendente"${i.status==="pendente"?" selected":""}>Pendente</option><option value="confirmado"${i.status==="confirmado"?" selected":""}>Confirmado</option></select></td><td><button class="x" data-di="${i.id}">Excluir</button></td></tr>`).join("")||`<tr><td colspan="8">Nenhuma inscrição ainda.</td></tr>`;
+  $("ti").innerHTML=I.filter(i=>!f||norm(i.nome).includes(f)||(fd&&(i.cpf||"").includes(fd))).map(i=>`<tr><td>${esc(i.nome)}${i.na_lista?"":" <small>(fora da lista)</small>"}</td><td>${mod(i.valor)}</td><td>${fc(i.cpf)}</td><td>${esc(i.telefone)}</td><td>${i.responsavel?esc(i.responsavel)+"<br><small>"+fc(i.responsavel_cpf)+" · "+esc(i.responsavel_telefone)+"</small>":"—"}</td><td>${i.valor===0?"<span class=ok>Isento</span>":i.comprovante_url?`<a href="${esc(i.comprovante_url)}" target="_blank" rel="noopener">Abrir</a>`:"<span class=pen>Falta</span>"}</td><td><select data-st="${i.id}"><option value="pendente"${i.status==="pendente"?" selected":""}>Pendente</option><option value="confirmado"${i.status==="confirmado"?" selected":""}>Confirmado</option></select></td><td><button class="x" data-di="${i.id}">Excluir</button></td></tr>`).join("")||`<tr><td colspan="8">Nenhuma inscrição ainda.</td></tr>`;
   const insc=new Set(I.map(i=>norm(i.nome))),fp=norm($("fp").value||"");
-  $("tp").innerHTML=D.participantes.filter(p=>!fp||norm(p.nome).includes(fp)).map(p=>`<tr><td>${esc(p.nome)}</td><td>${brl(p.valor)}</td><td><small>${[p.nascimento&&"nasc.",p.cpf&&"CPF",p.telefone&&"tel.",p.responsavel&&"responsável"].filter(Boolean).join(", ")||"—"}</small></td><td>${insc.has(norm(p.nome))?"<span class=ok>Inscrito</span>":"Não inscrito"}</td><td><button class="sec" data-ep="${p.id}">Editar</button> <button class="x" data-dp="${p.id}">Excluir</button></td></tr>`).join("")||`<tr><td colspan="5">Nenhum participante cadastrado.</td></tr>`}
+  $("tp").innerHTML=D.participantes.filter(p=>!fp||norm(p.nome).includes(fp)).map(p=>`<tr><td>${esc(p.nome)}</td><td>${mod(p.valor)}</td><td><small>${[p.nascimento&&"nasc.",p.cpf&&"CPF",p.telefone&&"tel.",p.responsavel&&"responsável"].filter(Boolean).join(", ")||"—"}</small></td><td>${insc.has(norm(p.nome))?"<span class=ok>Inscrito</span>":"Não inscrito"}</td><td><button class="sec" data-ep="${p.id}">Editar</button> <button class="x" data-dp="${p.id}">Excluir</button></td></tr>`).join("")||`<tr><td colspan="5">Nenhum participante cadastrado.</td></tr>`}
 $("fi").oninput=$("fp").oninput=desenha;$("rec").onclick=()=>carregar().then(()=>msg("Atualizado."));
 document.addEventListener("change",async e=>{const id=e.target.dataset.st;if(!id)return;try{await api("admin_status",{p_id:id,p_status:e.target.value});await carregar();msg("Status salvo.")}catch(x){msg("Erro ao salvar o status.",1)}});
 document.addEventListener("click",async e=>{const d=e.target.dataset;try{
@@ -128,10 +129,10 @@ $("salvar").onclick=async()=>{
 $("imp").onclick=async()=>{
   let v=null;const out=[];
   for(const l of $("lista").value.split("\n").map(s=>s.trim()).filter(Boolean)){
-    const h=l.match(/^(?:R\$\s*)?(40|50|60)(?:[,.]00)?\s*:?\s*$/i);if(h){v=+h[1];continue}
-    const m=l.match(/^(.+?)\s*[;\t]\s*(40|50|60)$/);
-    if(m)out.push({nome:m[1].trim(),valor:+m[2]});else if(v)out.push({nome:l.replace(/^[-*•\s]+/,""),valor:v})}
-  if(!out.length)return msg("Nenhum nome reconhecido. Use 'Nome;40' ou títulos como 'R$ 40:'.",1);
+    const h=l.match(/^(?:(?:R\$\s*)?(40|50|60)(?:[,.]00)?|(gratuit[oa]s?|isent[oa]s?))\s*:?\s*$/i);if(h){v=h[1]?+h[1]:0;continue}
+    const m=l.match(/^(.+?)\s*[;\t]\s*(40|50|60|0|gratuit[oa])$/i);
+    if(m)out.push({nome:m[1].trim(),valor:/^\d+$/.test(m[2])?+m[2]:0});else if(v!==null)out.push({nome:l.replace(/^[-*•\s]+/,""),valor:v})}
+  if(!out.length)return msg("Nenhum nome reconhecido. Use 'Nome;40', 'Nome;0' ou títulos como 'R$ 40:' / 'Gratuito:'.",1);
   try{const n=await api("admin_importar",{p_lista:out});$("lista").value="";await carregar();msg(`${n} adicionados (${out.length-n} já existiam).`);document.querySelector('[data-p="p2"]').click()}
   catch(x){msg("Erro ao importar.",1)}};
 $("csv").onclick=()=>{
