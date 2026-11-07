@@ -1,0 +1,25 @@
+ENCERRAMENTO JUVENTUDE DE FÁTIMA — como usar
+
+TESTAR: extraia o ZIP e dê duplo clique em index.html (modo demonstração, sem Supabase).
+        Nomes de teste: "Maria Exemplo" (R$ 40, já vem com telefone) e "Joao Exemplo" (R$ 50).
+
+LIGAR DE VERDADE:
+1. Supabase: crie o projeto. Abra supabase.sql, TROQUE a senha 'TROQUE-ESTA-SENHA' (linha do insert into config)
+   por uma senha longa sua e rode tudo no SQL Editor. Essa é a senha do admin.html.
+2. Em Project Settings > API copie a Project URL e a chave "anon public" para config.js.
+3. Drive: crie uma pasta, copie o ID dela, cole em apps-script.gs. Em script.google.com crie um projeto,
+   cole o código, Implantar > Nova implantação > App da Web (Executar como: eu / Acesso: qualquer pessoa)
+   e cole a URL em driveUrl no config.js.
+4. Preencha data, horário e local do evento e revise os textos das autorizações no config.js.
+5. Abra admin.html, entre com a senha, cadastre ou cole a lista de nomes (pode pré-preencher dados) e acompanhe
+   as inscrições, comprovantes e o total confirmado por modalidade.
+
+REGRAS DE CPF (aplicadas no servidor):
+- Cada CPF só pode ter uma inscrição como participante.
+- Menor: o CPF do responsável não pode ser igual ao do menor; o CPF de um menor não pode ter sido usado como
+  responsável; o responsável não pode ser um menor já inscrito.
+- Um mesmo responsável maior de idade pode ter vários menores inscritos.
+- Quem parou antes de enviar o comprovante pode voltar e retomar com o mesmo nome e CPF.
+
+PUBLICAR: suba a pasta inteira (index.html, admin.html, config.js e assets/) no GitHub Pages ou Netlify.
+Não divulgue o link do admin.html.
