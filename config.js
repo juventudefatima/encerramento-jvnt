@@ -1,7 +1,7 @@
 // ====== EDITE AQUI ======
 const C = {
   supabaseUrl: "https://dchbexdpoxgnxbffpstw.supabase.co",   // ex.: https://xxxx.supabase.co  (vazio = modo demonstração)
-  anonKey: "",       // chave "anon public" do Supabase
+  anonKey: "sb_publishable_8hUHO4wHs_4VVjl5e2C4JQ_6BSjCfUA",       // chave "anon public" do Supabase
   driveUrl: "https://script.google.com/macros/s/AKfycbx96Z0O2TO_5Kx86Rjn__eBchIC200A_nLlwxUxL8l7XWtyvQl_5__GM3KWJujrEHtz4A/exec",      // URL do Apps Script publicado (comprovantes -> Drive)
   evento: { data: "[DATA]", hora: "[HORÁRIO]", local: "[LOCAL]" },
   pixChave: "juventude.fatima.xv@gmail.com",
