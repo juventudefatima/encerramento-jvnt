@@ -3,7 +3,7 @@ const C = {
   supabaseUrl: "https://dchbexdpoxgnxbffpstw.supabase.co",   // ex.: https://xxxx.supabase.co  (vazio = modo demonstração)
   anonKey: "sb_publishable_8hUHO4wHs_4VVjl5e2C4JQ_6BSjCfUA",       // chave "anon public" do Supabase
   driveUrl: "https://script.google.com/macros/s/AKfycbyrTHdREE4yJCtmQJGi2n_SRCYm6cfAxyae9EyTVNbZqYgooBBaOkpEhP6l8WTwD7qxhA/exec",      // URL do Apps Script publicado (comprovantes -> Drive)
-  evento: { data: "07/12/2026", hora: "[HORÁRIO]", local: "[LOCAL]" },
+  evento: { data: "28/11/2026", hora: "8h às 19h", local: "Estrada Quiriri, 3999 - Dona Francisca, Joinville, Santa Catarina, Brasil" },
   pixChave: "juventude.fatima.xv@gmail.com",
   // Pix copia e cola de cada modalidade (já com o valor embutido). O QR Code está em assets/pix-40.png, pix-50.png, pix-60.png
   pixCopiaCola: { 40: "00020126640014br.gov.bcb.pix0129juventude.fatima.xv@gmail.com0209SEM VENDA520400005303986540540.005802BR5914GERADOR DE PIX6009SAO PAULO62070503***630425C5", 50: "00020126640014br.gov.bcb.pix0129juventude.fatima.xv@gmail.com0209SEM VENDA520400005303986540550.005802BR5914GERADOR DE PIX6009SAO PAULO62070503***6304BA20", 60: "00020126640014br.gov.bcb.pix0129juventude.fatima.xv@gmail.com0209SEM VENDA520400005303986540560.005802BR5914GERADOR DE PIX6009SAO PAULO62070503***63040A2E" },
